@@ -7,18 +7,31 @@ const curry = (fn) => (...args) => (
     ))(fn, ...args)
   ) : fn(...args)
 );
-// Исправленная версия
-// const curry = (fn, length = null) => (...args) => {
-//   length = length || fn.length;
-//   return length > args.length ? curry(
-//     ((fn, ...args1) => (...args2) => (
-//       fn(...args1.concat(args2))
-//     ))(fn, ...args), length - args.length
-//   ) : fn(...args);
-// };
-// Usage
 
 const sum4 = (a, b, c, d) => (a + b + c + d);
+
+// Исправленные версиии
+const curryWithoutBind = (fn, length = null) => (...args) => {
+  length = length ?? fn.length;
+  return length > args.length ? curryWithoutBind(
+    (...args2) => fn(...args.concat(args2))
+    , length - args.length
+  ) : fn(...args);
+};
+
+const curryWithBind = (fn) => (...args) => (
+  fn.length > args.length ? curryWithBind(fn.bind(null, ...args)) : fn(...args)
+);
+
+const curriedWithoutBind = curryWithoutBind(sum4);
+const yNoBind = curriedWithoutBind(1)(2)(3)(4);
+console.log(yNoBind);
+
+const curriedWithBind = curryWithBind(sum4);
+const yWithBind = curriedWithBind(1)(2)(3)(4);
+console.log(yWithBind);
+
+// Usage
 
 const f = curry(sum4);
 const y1 = sum4(1, 2, 3, 4);
